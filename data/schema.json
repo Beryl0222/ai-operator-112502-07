@@ -1,0 +1,7 @@
+{
+  "name": "ragged_segments",
+  "version": "1",
+  "description": "ragged offsets、掩码和空段样例。",
+  "input_file": "data/input.json",
+  "implementation": "由项目使用者根据业务契约提供"
+}

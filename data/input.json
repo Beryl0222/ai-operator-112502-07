@@ -1,0 +1,34 @@
+{
+  "offsets": [
+    0,
+    3,
+    3,
+    6
+  ],
+  "values": [
+    1.0,
+    0.0,
+    -2.0,
+    4.0,
+    5.0,
+    6.0
+  ],
+  "masks": [
+    [
+      true,
+      false,
+      true
+    ],
+    [],
+    [
+      true,
+      true,
+      false
+    ]
+  ],
+  "segment_ids": [
+    "a",
+    "empty",
+    "c"
+  ]
+}
