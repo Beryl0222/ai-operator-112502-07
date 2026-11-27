@@ -3,5 +3,33 @@
   "version": "1",
   "description": "ragged offsets、掩码和空段样例。",
   "input_file": "data/input.json",
-  "implementation": "由项目使用者根据业务契约提供"
+  "implementation": "operator_ragged_segments",
+  "representation": {
+    "offsets": "list[int]，长度为段数+1，单调不减，offsets[-1] == len(values)",
+    "values": "扁平拼接的 float，按 offsets 划分段落，不做 padding",
+    "masks": "逐段嵌套 list[bool]（与样例一致）或与 values 对齐的扁平 list[bool]；true 表示有效、允许参与归约",
+    "segment_ids": "每段的稳定身份，长度等于段数"
+  },
+  "allowed_statuses": {
+    "ok": "段内至少有一个有效元素，max/exp-sum/归一化均为最终值",
+    "empty": "offset 跨度为 0 的空段",
+    "fully_masked": "非空但所有位置都被掩码；明确的不可用状态（同义 unavailable/all_masked），不产生 NaN",
+    "pending": "流式输入尚未到齐，输出尚不具备最终资格",
+    "canceled": "段已被网关取消"
+  },
+  "eligibility": {
+    "eligible": "段的全部输入已到齐，可以给出最终结果；ok/empty/fully_masked 在批量算子中均为 eligible",
+    "not_eligible": "pending 段及其已接收位置，最终 max/sum 仍可能变化"
+  },
+  "precision_paths": {
+    "fast": "顺序求和",
+    "precise": "math.fsum 精确求和；两条路径共享 segment_ids、掩码语义与状态解释"
+  },
+  "guarantees": [
+    "掩码先于 max/exp-sum/归一化生效",
+    "屏蔽位置输出 0.0 且 valid_mask 为 false；有效值下溢为 0.0 时 valid_mask 仍为 true",
+    "任何结果与状态中都不出现 NaN/Inf",
+    "已交付段的 offsets 与结果快照不可被新 offsets 覆盖",
+    "未到齐输入保留可经 snapshot/from_snapshot 恢复的部分状态"
+  ]
 }
